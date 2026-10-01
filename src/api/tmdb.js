@@ -67,7 +67,16 @@ export async function getNowPlaying(pages = 3) {
 // "หนังทั้งหมดที่แอปใช้" โหลดจริงวันละครั้ง ที่เหลืออ่านจาก localStorage
 // หน้า Movies และหน้าแรกเรียกตัวนี้ จึงแชร์ข้อมูลชุดเดียวกัน
 export function getMovies() {
-  return onceADay(CACHE_KEY, () => getNowPlaying());
+  return onceADay(CACHE_KEY, async () => {
+    const res = await fetch('/api/movies');
+
+    if (!res.ok) {
+      throw new Error(`โหลดหนังไม่สำเร็จ ${res.status}`);
+    }
+
+    const data = await res.json();
+    return data.items;
+  });
 }
 
 // ค้นหาที่ server (ใช้ในหน้า API Lab เพื่อดู JSON ดิบ หน้า Movies กรองในเครื่องแทน)
